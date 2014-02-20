@@ -4,7 +4,9 @@
 #include <unistd.h>
 #include <GL/glut.h>
 using namespace std;
+struct Particle;
 float G = 6.67384*pow(10, -11);
+vector<Particle> zoo;
 struct Particle {
     Particle(float XPOS, float YPOS, float MASS):
              xpos(XPOS),ypos(YPOS),mass(MASS) {
@@ -68,11 +70,36 @@ struct Particle {
     }
     float xvel, yvel,
           xpos, ypos, mass, color[3];
-    vector<vector<float> > past; //precvious coords
+    vector<vector<float> > past; //previous coords
     unsigned int pid; //Particle ID
     static unsigned int pid_counter;
 }; unsigned int Particle::pid_counter = 0;
-vector<Particle> zoo;
+namespace Command {
+    vector<string> log(1, "");
+    //appends to command string and carries out the commands
+    void handle(unsigned char key, int x, int y) {
+        if(key == 0x08 && log.back().size() > 0) {
+            log.back() = log.back().substr(0, log.back().size()-1);
+        }
+        else if(key == 0x0D) {
+            /* run command here: */
+            log.push_back("");
+        }
+        else log.back() += key;
+    }
+    void render(void) {
+        float tracker;
+        unsigned short int i, u;
+        string temp;
+        for(tracker = 0.95f, i = 0; i < log.size(); ++i, tracker -= 0.02f) {
+            glRasterPos3f(-0.45f, tracker, 0.0f);
+            temp = ">"+log.at(i);
+            for(u = 0; u < temp.size(); ++u) {
+                glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, temp.at(u));
+            }
+        }
+    }
+}
 void clocked(void) {
     usleep(1000);
     glutPostRedisplay();
@@ -88,6 +115,7 @@ void render(void) {
     for(zit = zoo.begin();
         zit != zoo.end(); ++zit)
         zit->mov();
+    Command::render();
     glFlush();
 }
 int main(int argc, char** argv) {
@@ -96,9 +124,10 @@ int main(int argc, char** argv) {
     glutCreateWindow("Gravity");
     glPointSize(2.0f);
     glMatrixMode(GL_PROJECTION);
-    glOrtho(0, 1.0, 0, 1.0, -1, 1);
+    glOrtho(-0.5, 1.0, 0, 1.0, -1, 1);
     glutDisplayFunc(&render);
     glutIdleFunc(&clocked);
+    glutKeyboardFunc(&Command::handle);
 
     zoo.push_back(Particle(0.5f, 0.45f, 10000.0f));
     zoo.push_back(Particle(0.2f, 0.6f, 1.0f));
