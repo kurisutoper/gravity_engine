@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <unistd.h>
 #include <GL/glut.h>
 using namespace std;
 float G = 6.67384*pow(10, -11);
@@ -73,6 +74,7 @@ struct Particle {
 }; unsigned int Particle::pid_counter = 0;
 vector<Particle> zoo;
 void clocked(void) {
+    usleep(1000);
     glutPostRedisplay();
 }
 void render(void) {
@@ -90,14 +92,6 @@ void render(void) {
 }
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    zoo.push_back(Particle(0.2f, 0.5f, 1000.0f));
-    zoo.push_back(Particle(0.25f, 0.55f, 1000.0f));
-    zoo.push_back(Particle(0.15f, 0.45f, 1000.0f));
-    zoo.at(0).xvel = 0.001f;
-    zoo.at(2).xvel = -0.0001f;
-    zoo.at(0).changeColor(1.0f, 0.0f, 0.0f);
-    zoo.at(1).changeColor(0.0f, 1.0f, 0.0f);
-    zoo.at(2).changeColor(0.0f, 0.0f, 1.0f);
     glutInitWindowSize(600, 500);
     glutCreateWindow("Gravity");
     glPointSize(2.0f);
@@ -105,6 +99,13 @@ int main(int argc, char** argv) {
     glOrtho(0, 1.0, 0, 1.0, -1, 1);
     glutDisplayFunc(&render);
     glutIdleFunc(&clocked);
+
+    zoo.push_back(Particle(0.5f, 0.45f, 10000.0f));
+    zoo.push_back(Particle(0.2f, 0.6f, 1.0f));
+    zoo.at(0).changeColor(1.0f, 0.0f, 0.0f);
+    zoo.at(1).changeColor(0.0f, 1.0f, 0.0f);
+    zoo.at(1).xvel = 0.001f;
+
     glutMainLoop();
     return 0;
 }
