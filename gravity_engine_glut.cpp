@@ -94,6 +94,7 @@ namespace Command {
         float tracker;
         unsigned short int i, u;
         string temp;
+        glColor3f(1.0f, 1.0f, 1.0f);
         for(tracker = 0.95f, i = 0; i < log.size(); ++i, tracker -= 0.02f) {
             glRasterPos3f(-0.45f, tracker, 0.0f);
             temp = ">"+log.at(i);
@@ -118,8 +119,13 @@ void render(void) {
     for(zit = zoo.begin();
         zit != zoo.end(); ++zit)
         zit->mov();
+    //divides command area from particles(visually)
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glBegin(GL_LINES);
+        glVertex2f(0.0f, 0.0f);
+        glVertex2f(0.0f, 1.0f);
+    glEnd();
     Command::render();
-    //line to divide command area from particles.
     glFlush();
 }
 int main(int argc, char** argv) {
