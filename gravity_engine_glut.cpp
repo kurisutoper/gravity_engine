@@ -19,18 +19,21 @@ struct Particle {
     void render(void) {
         vector<vector<float> >::iterator n;
         glColor3f(color[0], color[1], color[2]);
-        //particle
-        glBegin(GL_POINTS);
-            glVertex2f(xpos, ypos);
-        glEnd();
-        //particle's tail
-        /* optimize later to only render
-        new parts of tail */
-        glBegin(GL_LINE_STRIP);
-            for(n = past.begin();
-                n != past.end(); ++n)
-                glVertex2f(n->at(0), n->at(1));
-        glEnd();
+        //to prevent leaking into the command area.
+        if(xpos > 0.0f) {
+            //particle
+            glBegin(GL_POINTS);
+                glVertex2f(xpos, ypos);
+            glEnd();
+            //particle's tail
+            /* optimize later to only render
+            new parts of tail */
+            glBegin(GL_LINE_STRIP);
+                for(n = past.begin();
+                    n != past.end(); ++n)
+                    glVertex2f(n->at(0), n->at(1));
+            glEnd();
+        }
     }
     //computes gravitation from other particles.
     void compForces(vector<Particle> zoo) {
@@ -116,6 +119,7 @@ void render(void) {
         zit != zoo.end(); ++zit)
         zit->mov();
     Command::render();
+    //line to divide command area from particles.
     glFlush();
 }
 int main(int argc, char** argv) {
